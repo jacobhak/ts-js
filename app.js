@@ -390,6 +390,60 @@ var DrifveriPage = React.createClass({
   }
 });
 
+var DrifveriBox = React.createClass({
+  render: function() {
+    return (
+	<div>
+        <h2>
+        Drifveriet anno {this.props.data.get("year")}
+      </h2>
+      </div>
+    );
+
+  }
+});
+
+var SpecificDrifveriPage = React.createClass({
+  mixins: [Router.State],
+  getInitialState: function() {
+    return {data: []};
+  },
+  loadDrifveriFromServer: function() {
+    var query = new Parse.Query(Drifveri);
+    query.equalTo('year', this.getParams().year);
+    query.find({
+      success: function (drifveri) {
+	this.setState({data: drifveri});
+	console.log(this.state.data);
+      }.bind(this),
+      error: function (object, error) {
+	console.log(error);
+      }.bind(this)
+    });
+  },
+  componentDidMount: function() {
+    this.loadDrifveriFromServer();
+  },
+  componentWillReceiveProps: function () {
+    this.loadDrifveriFromServer();
+  },
+  render: function() {
+    var nodes = this.state.data.map(function(drifveri) {
+      return (
+          <DrifveriBox data={drifveri}/>
+      );
+    });
+    return (
+	<div>
+	{nodes}
+      <AddDrifvareToDrifveriForm />
+	<RouteHandler />
+	</div>
+    );
+  }  
+});
+
+
 var routes = (
     <Route handler={App} path="/" >
     <DefaultRoute handler={DrifvarePage} />
@@ -403,6 +457,7 @@ var routes = (
     <Route name="drifveri" handler={DrifveriPage}>
     <DefaultRoute handler={DrifveriPage} />
     <Route name="newDrifveri" path='new' handler={NewDrifveriForm} />
+    <Route name='specificDrifveri' path=':year' handler={SpecificDrifveriPage} />
     </Route>
     <Router.NotFoundRoute handler={NotFoundPage} />
     </Route>
