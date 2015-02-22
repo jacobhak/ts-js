@@ -7,62 +7,6 @@ var Link = Router.Link;
 var Route = Router.Route;
 var RouteHandler = Router.RouteHandler;
 
-// Non React functions are not used, they're only examples...
-
-function newUser() {
-  var user = new Parse.User();
-  user.set("username", "jacobhak");
-//  user.set("password", "put pass here");
-  user.set("email", "jacobhakansson@gmail.com");
-  
-
-  user.set("phone", "0730299463");
-  user.set("address", "Gustav III:s boulevard 4");
-  user.set("postal_code", "16972");
-  user.set("city", "Solna");
-  user.set("country", "Sverige");
-  
-  user.signUp(null, {
-    success: function(user) {
-      // Hooray! Let them use the app now.
-    },
-    error: function(user, error) {
-      // Show the error message somewhere and let the user try again.
-      alert("Error: " + error.code + " " + error.message);
-    }
-    
-  });
-}
-function resetPassword() {
-  Parse.User.requestPasswordReset("jacobhakansson@gmail.com", {
-    success: function() {
-      // Password reset request was sent successfully
-    },
-    error: function(error) {
-      // Show the error message somewhere
-      alert("Error: " + error.code + " " + error.message);
-    }
-  });
-}
-function getUserWithUsername(username) {
-  var data;
-  var query = new Parse.Query(Parse.User);
-//  query.equalTo('username', username);
-  query.find({
-    success: function (user) {
-      console.log(user);
-      data = user;
-    },
-    error: function (object, error) {
-      console.log(error);
-    }
-  });
-}
-
-//getUserWithUsername("jacobhak");
-
-//resetPassword();
-
 var MessageBox = React.createClass({
   render: function() {
     if (this.props.message === "") {
