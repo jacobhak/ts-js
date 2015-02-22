@@ -1,4 +1,11 @@
+
 Parse.initialize("P1PqGmsTeS4VgUcRdM7CWhnY5A7mQ62r0UMGecZm", "i1qxHTkX3yWmxQY7jZ8x2PY06oNg75VAtFqVvvCO");
+
+var Router = ReactRouter;
+var DefaultRoute = Router.DefaultRoute;
+var Link = Router.Link;
+var Route = Router.Route;
+var RouteHandler = Router.RouteHandler;
 
 // Non React functions are not used, they're only examples...
 
@@ -187,8 +194,6 @@ var UserBox = React.createClass({
       <div className="commentBox">
 	Användare:
         <UserList data={this.state.data} />
-	<LoginForm />
-	<ResetPasswordForm />
 	<GravatarContainer userEmail="jacobhakansson@gmail.com" />
       </div>
     );
@@ -230,6 +235,59 @@ var User = React.createClass({
   }
 });
 
-React.render(
-    <UserBox />, document.getElementById('main')
+var App = React.createClass({
+  render: function() {
+    return (
+	<div>
+	<RouteHandler />
+	</div>
+    );
+  }
+});
+
+var LoginPage = React.createClass({
+  render: function() {
+    return (
+	<div>
+	<LoginForm />
+	<RouteHandler />
+	</div>
+    );
+  }
+});
+
+var ResetPasswordPage = React.createClass({
+  render: function() {
+    return (
+	<div>
+	<ResetPasswordForm />
+	<RouteHandler />
+	</div>
+    );
+  }
+});
+
+var DrifvarePage = React.createClass({
+  render: function() {
+    return (
+      <div>
+	<UserBox />
+	<RouteHandler />
+	</div>
+    );
+  }
+});
+
+var routes = (
+    <Route handler={App} path="/" >
+    <Route name='login' handler={LoginPage} />
+    <Route name="reset" handler={ResetPasswordPage} />
+    <Route name="drifvare" handler={DrifvarePage} />
+    </Route>
 );
+
+Router.run(routes, function (Handler) {
+  React.render(
+      <Handler />, document.getElementById('main')
+  );
+});
