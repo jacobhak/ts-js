@@ -85,6 +85,7 @@ var GravatarContainer = React.createClass({
   }
 });
 
+
 var NewUserForm = React.createClass({
   getInitialState: function() {
     return {email: '', message: ""};
@@ -234,7 +235,6 @@ var UserBox = React.createClass({
 	Användare:
         <UserList data={this.state.data} />
 	<GravatarContainer userEmail="jacobhakansson@gmail.com" />
-	<NewUserForm />
       </div>
     );
   }
@@ -277,11 +277,15 @@ var User = React.createClass({
 
 var App = React.createClass({
   render: function() {
-    return (
+    if(Parse.User.current()) {
+      return (
 	<div>
 	<RouteHandler />
 	</div>
-    );
+      );
+    } else {
+      return <p>Lol, du får inte se det här</p>;
+    }
   }
 });
 
@@ -318,11 +322,79 @@ var DrifvarePage = React.createClass({
   }
 });
 
+var DrifvareHandler = React.createClass({
+  render: function() {
+    return <RouteHandler />;
+  }
+});
+
+var NewUserPage = React.createClass({
+  render: function() {
+    return (
+	<div>
+	<NewUserForm />
+	<RouteHandler />
+	</div>
+    );
+  }
+});
+
+var UserPage = React.createClass({
+  mixins: [Router.State],
+  getInitialState: function() {
+    return {data: []};
+  },
+  loadUserFromServer: function() {
+    var query = new Parse.Query(Parse.User);
+    query.equalTo('username', this.getParams().email);
+    query.find({
+      success: function (user) {
+	this.setState({data: user});
+	console.log(this.state.data);
+      }.bind(this),
+      error: function (object, error) {
+	console.log(error);
+      }.bind(this)
+    });
+  },
+  componentDidMount: function() {
+    this.loadUserFromServer();
+  },
+  componentWillReceiveProps: function () {
+    this.loadUserFromServer();
+  },
+  render: function() {
+    var nodes = this.state.data.map(function(user) {
+      return (
+          <User data={user}/>
+      );
+    });
+    return (
+	<div>
+	{nodes}
+	<RouteHandler />
+	</div>
+    );
+  }
+});
+
+var NotFoundPage = React.createClass({
+  render: function() {
+    return <p>Nu har du gått vilse...</p>;
+  }
+});
+
 var routes = (
     <Route handler={App} path="/" >
+    <DefaultRoute handler={DrifvarePage} />
     <Route name='login' handler={LoginPage} />
     <Route name="reset" handler={ResetPasswordPage} />
-    <Route name="drifvare" handler={DrifvarePage} />
+    <Route name="drifvare" path="drifvare" handler={DrifvareHandler}>
+    <DefaultRoute handler={DrifvarePage}/>
+    <Route name="newDrifvare" path='new' handler={NewUserPage}/>
+    <Route name='specificDrifvare' path=':email' handler={UserPage} />
+    </Route>
+    <Router.NotFoundRoute handler={NotFoundPage} />
     </Route>
 );
 
