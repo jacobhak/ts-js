@@ -7,6 +7,8 @@ var Link = Router.Link;
 var Route = Router.Route;
 var RouteHandler = Router.RouteHandler;
 
+var Drifveri = Parse.Object.extend('Drifveri');
+
 var MessageBox = React.createClass({
   render: function() {
     if (this.props.message === "") {
@@ -29,6 +31,56 @@ var GravatarContainer = React.createClass({
   }
 });
 
+var NewDrifveriForm = React.createClass({
+  getInitialState: function () {
+    return {
+      year: '',
+      archzero: '',
+      skylt: '',
+      message: ''
+    };
+  },
+  handleSubmit: function(e) {
+    e.preventDefault();
+    var drifveri = new Drifveri();
+    drifveri.set('year', this.state.year);
+    drifveri.set('archzero', this.state.archzero);
+    drifveri.set('skylt', this.state.skylt);
+    drifveri.save(null, {
+      success: function() {
+	this.setState({message: "Drifveri tillagt"});
+      }.bind(this),
+      error: function(drifveri, error) {
+	this.setState({message: error.message});
+      }.bind(this)
+    });
+  },
+  handleChange: function () {
+    this.setState({
+      year: this.refs.yearField.getDOMNode().value,
+      archzero: this.refs.archzeroField.getDOMNode().value,
+      skylt: this.refs.skyltField.getDOMNode().value
+    });
+  },
+  render: function(){
+    return (
+	<div>
+	Lägg till nytt Drifveri
+	<MessageBox message={this.state.message} />
+	<form onSubmit= {this.handleSubmit}>
+	<label htmlFor="year">År</label>
+	<input ref="yearField" name='year' type="text" value={this.state.year} onChange={this.handleChange}/>
+	<label htmlFor="archzero">Ärken0llan</label>
+	<input ref="archzeroField" name='archzero' type="text" value={this.state.archzero} onChange={this.handleChange}/>
+	<label htmlFor="skylt">Ärken0llan</label>
+	<input ref="skyltField" name='skylt' type="text" value={this.state.skylt} onChange={this.handleChange}/>
+	<button type="submit">Lägg till</button>
+	</form>
+	</div>
+    );
+  }
+
+});
 
 var NewUserForm = React.createClass({
   getInitialState: function() {
@@ -328,6 +380,16 @@ var NotFoundPage = React.createClass({
   }
 });
 
+var DrifveriPage = React.createClass({
+  render: function() {
+    return (
+	<div>
+	<RouteHandler />
+	</div>
+    );
+  }
+});
+
 var routes = (
     <Route handler={App} path="/" >
     <DefaultRoute handler={DrifvarePage} />
@@ -337,6 +399,10 @@ var routes = (
     <DefaultRoute handler={DrifvarePage}/>
     <Route name="newDrifvare" path='new' handler={NewUserPage}/>
     <Route name='specificDrifvare' path=':email' handler={UserPage} />
+    </Route>
+    <Route name="drifveri" handler={DrifveriPage}>
+    <DefaultRoute handler={DrifveriPage} />
+    <Route name="newDrifveri" path='new' handler={NewDrifveriForm} />
     </Route>
     <Router.NotFoundRoute handler={NotFoundPage} />
     </Route>
