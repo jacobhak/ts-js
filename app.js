@@ -124,21 +124,54 @@ var NewUserForm = React.createClass({
   }
 });
 
+var NewUserGenericForm = React.createClass({
+  submit: function(e) {
+    e.preventDefault();
+    var state = this.refs.form.state;
+    var user = new Parse.User();
+    user.set("username", state.email);
+    user.set("password", "" + Math.random());
+    user.set("email", state.email);
+    
+    user.signUp(null, {
+      success: function(user) {
+	this.setState({message: "Drifvare tillagd"});
+      }.bind(this),
+      error: function(user, error) {
+	this.setState({message: error.message});
+      }.bind(this)
+    }); 
+  },
+  render: function() {
+    return (
+	<GenericForm ref='form' submit={this.submit} submitText="Lägg till">
+	<label htmlFor="email">E-mail</label>
+	<input ref="emailField" type="email" name="email"
+      value={this.refs.form.state.email} onChange={this.refs.form.handleChange}/>
+	</GenericForm>
+    );
+  }
+});
+
 var GenericForm = React.createClass({
   stateFromChildren: function() {
     var state = {};
-    React.Children.ForEach(this.props.children, function(child){
+    React.Children.forEach(this.props.children, function(child){
       if(child.props.name) {
-	state[child.props.name] = child.getDOMNode().value;
+	console.log(child.props.name);
+	state[child.props.name] = child.value;
       }
     });
     return state;
   },
   getInitialState: function() {
-    return this.stateFromChildren();
+    var state = this.stateFromChildren();
+    state['message'] = '';
+    return state;
   },
   handleChange: function () {
     this.setState(this.stateFromChildren());
+    console.log(this.state);
   },
   render: function() {
     return (
@@ -263,7 +296,7 @@ var UserBox = React.createClass({
 	Användare:
         <UserList data={this.state.data} />
 	<GravatarContainer userEmail="jacobhakansson@gmail.com" />
-	<NewUserForm />
+	<NewUserGenericForm />
       </div>
     );
   }
