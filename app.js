@@ -443,6 +443,62 @@ var SpecificDrifveriPage = React.createClass({
   }  
 });
 
+var UserSearchInput = React.createClass({
+  getInitialState: function () {
+    return {
+      value: '',
+      searchResults: [],
+      chosenUser:null
+    };
+  },
+  searchUsers : function(value) {
+    if(value === "") {
+      this.setState({searchResults: []});
+    } else {
+      var query = new Parse.Query(Parse.User);
+      query.startsWith('username', value);
+      query.limit(10);
+      query.find({
+	success: function (results) {
+	  this.setState({searchResults: results});
+	  console.log(this.state);
+	}.bind(this),
+	error: function (object, error) {
+	  console.log(error);
+	}.bind(this)
+      });      
+    }
+  },
+  handleChange: function() {
+    var value = this.refs.searchText.getDOMNode().value;
+    this.searchUsers(value);
+    this.setState({value: value});
+  },
+  render: function() {
+    var nodes = this.state.searchResults.map(function(user) {
+      return (
+	  <li>{user.get('username')}</li>
+      );
+    });
+
+    return (
+	<div>
+	<input type='text' ref='searchText' value={this.state.value} onChange={this.handleChange} />
+	<ul>
+	{nodes}
+      </ul>
+	</div>
+    );
+  }
+ 
+});
+
+var AddDrifvareToDrifveriForm  = React.createClass({
+  render: function() {
+    return <UserSearchInput />;
+  }
+});
+
 
 var routes = (
     <Route handler={App} path="/" >
