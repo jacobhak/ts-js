@@ -494,8 +494,31 @@ var UserSearchInput = React.createClass({
 });
 
 var AddDrifvareToDrifveriForm  = React.createClass({
+  getInitialState: function(){
+    return {};
+  },
+  handleRoleChange: function() {
+    
+  },
   render: function() {
-    return <UserSearchInput />;
+    return (
+      <div>
+	<h3>Lägg till drifvare i drifveriet:</h3>
+	<UserSearchInput />
+	Roll:
+	<EditDrifvarRole year={this.props.year} onChange={this.handleRoleChange} />
+	</div>
+    );
+  }
+});
+
+var EditDrifvarRole = React.createClass({
+  render: function() {
+    return (
+	<div>
+	<input type='checkbox' checked="false"/>
+	</div>
+    );
   }
 });
 
