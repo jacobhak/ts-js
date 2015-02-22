@@ -124,7 +124,34 @@ var NewUserForm = React.createClass({
   }
 });
 
-
+var GenericForm = React.createClass({
+  stateFromChildren: function() {
+    var state = {};
+    React.Children.ForEach(this.props.children, function(child){
+      if(child.props.name) {
+	state[child.props.name] = child.getDOMNode().value;
+      }
+    });
+    return state;
+  },
+  getInitialState: function() {
+    return this.stateFromChildren();
+  },
+  handleChange: function () {
+    this.setState(this.stateFromChildren());
+  },
+  render: function() {
+    return (
+	<div>
+	<MessageBox message={this.state.message} />
+	<form onSubmit={this.props.submit} >
+	{this.props.children}
+	<button type="submit">{this.props.submitText}</button>
+	</form>
+      </div>
+    );
+  }
+});
 
 var ResetPasswordForm = React.createClass({
   getInitialState: function() {
