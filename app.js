@@ -85,6 +85,47 @@ var GravatarContainer = React.createClass({
   }
 });
 
+var NewUserForm = React.createClass({
+  getInitialState: function() {
+    return {email: '', message: ""};
+  },
+  handleSubmit: function(e) {
+    e.preventDefault();
+    var user = new Parse.User();
+    user.set("username", this.state.email);
+    user.set("password", "" + Math.random());
+    user.set("email", this.state.email);
+    
+    user.signUp(null, {
+      success: function(user) {
+	this.setState({message: "Drifvare tillagd"});
+      }.bind(this),
+      error: function(user, error) {
+	this.setState({message: error.message});
+      }.bind(this)
+    }); 
+
+  },
+  handleChange: function () {
+    this.setState({email: this.refs.emailField.getDOMNode().value});
+  },
+  render: function(){
+    return (
+	<div>
+	Lägg till ny Drifvare
+	<MessageBox message={this.state.message} />
+	<form onSubmit= {this.handleSubmit}>
+	<label htmlFor="email">E-mail</label>
+	<input ref="emailField" type="email" name="email" value={this.state.email} onChange={this.handleChange}/>
+	<button type="submit">Lägg till</button>
+	</form>
+	</div>
+    );
+  }
+});
+
+
+
 var ResetPasswordForm = React.createClass({
   getInitialState: function() {
     return {email: "", errorMessage: ""};
@@ -195,6 +236,7 @@ var UserBox = React.createClass({
 	Användare:
         <UserList data={this.state.data} />
 	<GravatarContainer userEmail="jacobhakansson@gmail.com" />
+	<NewUserForm />
       </div>
     );
   }
